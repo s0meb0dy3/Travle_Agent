@@ -1,13 +1,14 @@
 from fastapi.testclient import TestClient
 
-from app.api.v1.dependencies import get_travel_service
+from app.api.v1.dependencies import get_plan_agent
 from app.main import app
-from app.schemas.travel import TravelResponse
+from app.models.agent import AgentOutput
+from app.models.travel import TravelResponse
 
 
-class StubTravelService:
-    async def generate_plan(self, request):  # noqa: ANN001
-        return TravelResponse.model_validate(
+class StubPlanAgent:
+    async def run(self, request):  # noqa: ANN001
+        result = TravelResponse.model_validate(
             {
                 "mode": "itinerary",
                 "summary": f"{request.destination}{request.days}天轻松游",
@@ -28,16 +29,27 @@ class StubTravelService:
                 "tips": ["注意防晒"],
             }
         )
+        return AgentOutput(
+            request_id="req-test-001",
+            result=result,
+            fallback_used=False,
+            latency_ms=12.3,
+            agent_name="plan",
+            provider_name="siliconflow",
+        )
+
+    async def generate_result(self, request):  # noqa: ANN001
+        return (await self.run(request)).result
 
 
 client = TestClient(app)
 
 
-def override_travel_service() -> StubTravelService:
-    return StubTravelService()
+def override_plan_agent() -> StubPlanAgent:
+    return StubPlanAgent()
 
 
-app.dependency_overrides[get_travel_service] = override_travel_service
+app.dependency_overrides[get_plan_agent] = override_plan_agent
 
 
 def test_healthz() -> None:
@@ -78,3 +90,19 @@ def test_generate_plan_invalid_style() -> None:
         json={"origin": "上海", "destination": "杭州", "days": 2, "style": ["party"]},
     )
     assert response.status_code == 422
+
+
+def test_agent_plan_success() -> None:
+    response = client.post(
+        "/api/v1/agent/plan",
+        json={
+            "origin": "上海",
+            "destination": "杭州",
+            "days": 2,
+        },
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["request_id"] == "req-test-001"
+    assert body["status"] == "completed"
+    assert body["result"]["mode"] == "itinerary"

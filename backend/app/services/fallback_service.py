@@ -1,4 +1,4 @@
-from app.schemas.travel import ItineraryDay, TravelPlan, TravelRequest, TravelResponse, TravelStyle
+from app.models.travel import ItineraryDay, TravelPlan, TravelRequest, TravelResponse, TravelStyle
 
 
 def _normalize(value: str | None) -> str:

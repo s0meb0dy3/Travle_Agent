@@ -1,3 +1,4 @@
+from app.api.v1.agent import router as agent_router
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -31,4 +32,5 @@ async def healthz() -> dict[str, str]:
     return {"status": "ok"}
 
 
+app.include_router(agent_router, prefix=settings.api_v1_prefix)
 app.include_router(generate_router, prefix=settings.api_v1_prefix)

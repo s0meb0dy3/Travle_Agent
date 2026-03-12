@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 
-from app.api.v1.dependencies import get_travel_service
-from app.schemas.travel import TravelRequest, TravelResponse
-from app.services.travel_service import TravelService
+from app.agents.plan_agent import PlanAgent
+from app.api.v1.dependencies import get_plan_agent
+from app.models.travel import TravelRequest, TravelResponse
 
 router = APIRouter()
 
@@ -10,6 +10,6 @@ router = APIRouter()
 @router.post("/generate", response_model=TravelResponse)
 async def generate_plan(
     request: TravelRequest,
-    travel_service: TravelService = Depends(get_travel_service),
+    plan_agent: PlanAgent = Depends(get_plan_agent),
 ) -> TravelResponse:
-    return await travel_service.generate_plan(request)
+    return await plan_agent.generate_result(request)

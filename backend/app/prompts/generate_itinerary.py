@@ -1,7 +1,7 @@
-from app.schemas.travel import TravelRequest
+from app.models.travel import TravelRequest
 
 
-def build_generate_messages(request: TravelRequest) -> list[dict[str, str]]:
+def build_planner_messages(request: TravelRequest) -> list[dict[str, str]]:
     styles = ", ".join(item.value for item in request.style or []) or "无特别偏好"
     budget = request.budget or "未提供"
     prompt = request.prompt or "无额外补充"
@@ -45,3 +45,7 @@ def build_generate_messages(request: TravelRequest) -> list[dict[str, str]]:
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
+
+
+def build_generate_messages(request: TravelRequest) -> list[dict[str, str]]:
+    return build_planner_messages(request)
