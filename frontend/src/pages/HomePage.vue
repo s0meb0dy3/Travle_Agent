@@ -87,9 +87,10 @@ const handleSubmit = async (request: TravelRequest) => {
     const result = await generatePlan(request);
     session.setResult(result);
     await router.push("/plan");
-  } catch {
-    session.setError("这次生成没有成功，请再试一次。");
-    localError.value = "这次生成没有成功，请再试一次。";
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "这次生成没有成功，请再试一次。";
+    session.setError(message);
+    localError.value = message;
   } finally {
     session.setLoading(false);
   }

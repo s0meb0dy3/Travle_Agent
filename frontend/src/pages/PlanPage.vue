@@ -13,7 +13,7 @@
           </button>
           <RouterLink
             to="/"
-            class="rounded-full bg-[var(--text)] px-5 py-3 text-sm font-medium text-white transition hover:bg-black"
+            class="rounded-full bg-[var(--text)] px-5 py-3 text-sm font-medium !text-white transition hover:bg-black"
           >
             重新生成
           </RouterLink>

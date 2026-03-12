@@ -1,19 +1,26 @@
-import { planTemplates } from "../modules/travel/mockData";
 import type { TravelRequest, TravelResult } from "../modules/travel/types";
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export const generatePlan = async (request: TravelRequest): Promise<TravelResult> => {
-  await wait(900);
+  const response = await fetch("/api/v1/generate", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(request),
+  });
 
-  if (request.destination.trim() === "故障测试") {
-    throw new Error("mock service unavailable");
+  if (!response.ok) {
+    let message = "generate plan failed";
+
+    try {
+      const payload = (await response.json()) as { detail?: string };
+      message = payload.detail || message;
+    } catch {
+      // Ignore JSON parsing failures and fall back to the generic error.
+    }
+
+    throw new Error(message);
   }
 
-  const template = planTemplates.find((item) => item.matches(request));
-  if (!template) {
-    throw new Error("no plan template");
-  }
-
-  return template.build(request);
+  return response.json() as Promise<TravelResult>;
 };
