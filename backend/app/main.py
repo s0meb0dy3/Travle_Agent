@@ -13,7 +13,7 @@ settings = get_settings()
 
 app = FastAPI(title=settings.app_name)
 
-app.add_middleware(
+app.add_middleware( #添加中间件
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,

@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 from app.api.v1.dependencies import get_plan_agent
 from app.main import app
-from app.models.agent import AgentOutput
+from app.models.agent import AgentRunResult
 from app.models.travel import TravelResponse
 
 
@@ -29,7 +29,7 @@ class StubPlanAgent:
                 "tips": ["注意防晒"],
             }
         )
-        return AgentOutput(
+        return AgentRunResult(
             request_id="req-test-001",
             result=result,
             fallback_used=False,
